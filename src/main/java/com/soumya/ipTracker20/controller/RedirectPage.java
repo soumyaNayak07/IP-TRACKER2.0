@@ -43,10 +43,10 @@ public class RedirectPage {
         LocalDateTime now= LocalDateTime.now();
 
 //        for deployment
-//        String ip=request.getRemoteAddr();
+       String ip=request.getRemoteAddr();
 
 //        for testing
-        String ip="204.84.125.89";
+        // String ip="204.84.125.89";
 
         // Extract username and link from request parameters
         String username = request.getParameter("username");
