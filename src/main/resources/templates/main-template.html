@@ -411,7 +411,7 @@
     resultDiv.classList.add('d-none');
 
     try {
-      const backendUrl = "http://localhost:8080";  // adjust as needed
+      const backendUrl = "";  // adjust as needed
       const response = await fetch(`${backendUrl}/home/api/ip-lookup?ip=${encodeURIComponent(ip)}`);
       if (!response.ok) throw new Error('Network error');
 
