@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Link Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+        background: linear-gradient(120deg, #232526 0%, #414345 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+    }
+    .generator-box {
+        background: #181a1b;
+        padding: 2.5rem 2rem 2rem 2rem;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        width: 100%;
+        max-width: 500px;
+        animation: fadeIn 0.7s ease;
+        text-align: center;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    h3 {
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+    }
+    .form-control {
+        background-color: #23272b;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+    .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 2px #6a11cb33;
+        background-color: #23272b;
+        color: #fff;
+    }
+    .form-control::placeholder {
+        color: #aaa;
+    }
+    .btn-generate {
+        background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        font-weight: bold;
+        border-radius: 8px;
+        width: 100%;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 8px #6a11cb33;
+        transition: background 0.2s, transform 0.2s;
+    }
+    .btn-generate:hover {
+        background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+        transform: scale(1.03);
+    }
+    .custom-link {
+        margin-top: 20px;
+        background-color: #23272b;
+        padding: 15px;
+        border-left: 5px solid #6a11cb;
+        border-radius: 8px;
+        word-break: break-word;
+        color: #fff;
+        animation: fadeIn 0.5s ease-in-out;
+        font-weight: bold;
+    }
+    @media (max-width: 600px) {
+        .generator-box {
+            padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="generator-box text-center">
+  <h3 class="mb-4">🔗 Create Your Custom Link</h3>
+  <input type="text" id="originalLink" class="form-control mb-3" placeholder="Paste the URL you want to shorten...">
+  <button onclick="generateCustomLink()" class="btn btn-generate w-100">Generate Link</button>
+  <div id="result" class="custom-link mt-4 d-none"></div>
+</div>
+<script>
+  function generateCustomLink() {
+      const input = document.getElementById("originalLink").value.trim();
+      if (!input) {
+          alert("Please enter a valid URL.");
+          return;
+      }
+      const baseUrl = window.location.origin;
+      const shortcode = Math.random().toString(36).substring(2, 8);
+      const customUrl = `${baseUrl}/home?redirect=${encodeURIComponent(input)}&code=${shortcode}`;
+      const resultDiv = document.getElementById("result");
+      resultDiv.classList.remove("d-none");
+      resultDiv.innerHTML = `✅ Your custom link: <a href="${customUrl}" target="_blank">${customUrl}</a>`;
+  }
+</script>
+</body>
+</html>

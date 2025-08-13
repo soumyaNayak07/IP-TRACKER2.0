@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Log IP Address</title>
+    <script>
+        function logIp() {
+            // Get parameters from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const redirect = urlParams.get('redirect');
+            
+            // Create form data
+            const formData = new FormData();
+            if (username) formData.append('username', username);
+            if (redirect) formData.append('redirect', redirect);
+            
+            fetch("/home/ip", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // IP logged successfully
+            })
+            .catch(error => {
+                alert("Error logging IP: " + error);
+            });
+        }
+
+        window.onload = function() {
+            logIp();
+
+            // Get the redirect URL from query params
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+
+            if (redirectUrl) {
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 10); // redirect after 1 second
+            }
+        };
+    </script>
+</head>
+<body>
+<!-- Optionally add a message -->
+<!--<h3>Logging your visit... Redirecting shortly.</h3>-->
+</body>
+</html>

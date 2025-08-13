@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IP Tracker Map Pro</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(120deg, #232526 0%, #414345 100%);
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        header {
+            background: #181a1b;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+            user-select: none;
+            z-index: 1000;
+            color: #fff;
+        }
+        #container {
+            display: flex;
+            flex: 1;
+            height: calc(100% - 72px);
+            overflow: hidden;
+            position: relative;
+        }
+        #map {
+            flex: 4;
+            height: 100%;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+            transition: all 0.3s ease;
+            border-right: 1px solid #2c2f33;
+            position: relative;
+            z-index: 1;
+        }
+        #sidebar {
+            flex: 1;
+            max-width: 320px;
+            background: #23272b;
+            padding: 1.5rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: inset 0 0 20px #000000aa;
+            color: #a0aec0;
+            overflow-y: auto;
+            font-size: 1rem;
+        }
+        #sidebar h2 {
+            color: #6a11cb;
+            margin-bottom: 1.25rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #6a11cb;
+            padding-bottom: 0.5rem;
+        }
+        #sidebar .field {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #sidebar .field strong {
+            color: #cbd5e1;
+        }
+        .copy-btn {
+            background: #6a11cb;
+            border: none;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 1px 4px #6a11cb88;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #2575fc;
+        }
+        .copy-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .copy-tooltip .tooltiptext {
+            visibility: hidden;
+            width: 70px;
+            background-color: #6a11cb;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -35px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+        }
+        .copy-tooltip.show .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .custom-marker-icon {
+            background: #6a11cb;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            box-shadow: 0 0 8px #6a11cb88;
+            border: 2px solid white;
+            position: relative;
+        }
+        .custom-marker-icon::after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #b388ff;
+            top: 6px;
+            left: 6px;
+            animation: pulse 2s infinite;
+            opacity: 0.7;
+            filter: blur(4px);
+            z-index: -1;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+        .leaflet-interactive {
+            stroke-dasharray: 12 10 !important;
+            animation: dashmove 4s linear infinite;
+        }
+        @keyframes dashmove {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 22; }
+        }
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        @media (max-width: 900px) {
+            #container {
+                flex-direction: column;
+            }
+            #map, #sidebar {
+                flex: none;
+                width: 100%;
+                height: 50vh;
+            }
+            #sidebar {
+                max-width: none;
+                padding: 1rem 1.25rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    IP Tracker Map
+</header>
+<div id="container">
+    <div id="map"></div>
+    <aside id="sidebar" role="complementary" aria-live="polite" aria-atomic="true">
+        <h2>IP Location Details</h2>
+        <div id="details">Loading data...</div>
+    </aside>
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([20.5937, 78.9629], 4);
+    L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19
+      }
+    ).addTo(map);
+    const customIcon = L.divIcon({
+      className: 'custom-marker-icon',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    function createCopyButton(text) {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn copy-tooltip';
+      btn.type = 'button';
+      btn.textContent = 'Copy';
+      const tooltip = document.createElement('span');
+      tooltip.className = 'tooltiptext';
+      tooltip.textContent = 'Copied!';
+      btn.appendChild(tooltip);
+      btn.onclick = () => {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.classList.add('show');
+          setTimeout(() => btn.classList.remove('show'), 1200);
+        });
+      };
+      return btn;
+    }
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    const ip = getQueryParam('ip');
+    const lat = parseFloat(getQueryParam('lat'));
+    const lon = parseFloat(getQueryParam('lon'));
+    const city = getQueryParam('city');
+    const region = getQueryParam('region');
+    const country = getQueryParam('country');
+    const zip = getQueryParam('zip');
+    const isp = getQueryParam('isp');
+    const date = getQueryParam('date');
+    const time = getQueryParam('time');
+    const details = document.getElementById('details');
+    if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+      details.textContent = 'Invalid or missing coordinates in URL.';
+      alert('Invalid or missing coordinates in URL.');
+    } else {
+      map.setView([lat, lon], 13);
+      const marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
+      const radiusMeters = 7000;
+      const circle = L.circle([lat, lon], {
+        color: '#6a11cb',
+        fillColor: '#6a11cb',
+        fillOpacity: 0.15,
+        radius: radiusMeters,
+        weight: 3,
+        dashArray: '12,10'
+      }).addTo(map);
+      map.fitBounds(circle.getBounds(), { padding: [40, 40] });
+      details.innerHTML = '';
+      const fields = [
+        { label: 'IP Address', value: ip },
+        { label: 'City', value: city || 'N/A' },
+        { label: 'Region', value: region || 'N/A' },
+        { label: 'Country', value: country || 'N/A' },
+        { label: 'ZIP Code', value: zip || 'N/A' },
+        { label: 'ISP', value: isp || 'N/A' },
+        { label: 'Date', value: date || 'N/A' },
+        { label: 'Time', value: time || 'N/A' }
+      ];
+      fields.forEach(field => {
+        const div = document.createElement('div');
+        div.className = 'field';
+        const strong = document.createElement('strong');
+        strong.textContent = field.label + ':';
+        div.appendChild(strong);
+        const span = document.createElement('span');
+        span.textContent = field.value;
+        div.appendChild(span);
+        if (field.label === 'IP Address' && field.value !== 'N/A') {
+          const copyBtn = createCopyButton(field.value);
+          div.appendChild(copyBtn);
+        }
+        details.appendChild(div);
+      });
+      const note = document.createElement('div');
+      note.className = 'field';
+      note.style.fontStyle = 'italic';
+      note.style.color = '#9ca3af';
+      note.style.marginTop = '12px';
+      note.textContent = `Approximate location within ${radiusMeters / 1000} km radius`;
+      details.appendChild(note);
+      const popupContent = `
+        <strong>IP:</strong> ${ip}<br/>
+        <strong>City:</strong> ${city || 'N/A'}<br/>
+        <strong>Region:</strong> ${region || 'N/A'}<br/>
+        <strong>Country:</strong> ${country || 'N/A'}<br/>
+        <strong>ISP:</strong> ${isp || 'N/A'}<br/>
+        <strong>Date:</strong> ${date || 'N/A'}<br/>
+        <strong>Time:</strong> ${time || 'N/A'}<br/>
+        <em>Approximate location within ${radiusMeters / 1000} km radius</em>
+      `;
+      marker.bindPopup(popupContent).openPopup();
+    }
+</script>
+</body>
+</html>

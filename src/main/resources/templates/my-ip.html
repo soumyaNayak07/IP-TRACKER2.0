@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My IP - TrackLink</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #232526 0%, #414345 100%);
+            color: #f1f1f1;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container-box {
+            background: #181a1b;
+            padding: 2.5rem 2rem 2rem 2rem;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            max-width: 500px;
+            width: 100%;
+            margin: 40px auto;
+            animation: fadeIn 0.7s ease;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            margin-bottom: 30px;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .ip-card {
+            background-color: #23272b;
+            padding: 30px;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 15px #6a11cbaa;
+            user-select: all;
+            max-width: 350px;
+            margin: 0 auto;
+            font-family: monospace;
+            color: #fff;
+        }
+        footer {
+            background-color: #181a1b;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            color: #aaa;
+        }
+        @media (max-width: 600px) {
+            .container-box {
+                padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- PRIMARY NAVBAR (optional) -->
+<!-- You can add a consistent navbar here if desired -->
+<div class="main-content">
+    <div class="container-box text-center">
+        <h2>📡 Your Current IP Address</h2>
+        <div id="ipDisplay" class="ip-card">Loading your IP...</div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <p>&copy; 2025 TrackLink. All rights reserved.</p>
+    </div>
+</footer>
+<script>
+    async function fetchIP() {
+      try {
+        // Use a free public API to get user IP
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        document.getElementById('ipDisplay').textContent = data.ip;
+      } catch (error) {
+        document.getElementById('ipDisplay').textContent = 'Failed to get IP address';
+      }
+    }
+    fetchIP();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
