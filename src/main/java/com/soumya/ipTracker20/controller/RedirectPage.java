@@ -43,7 +43,13 @@ public class RedirectPage {
         LocalDateTime now= LocalDateTime.now();
 
 //        for deployment
-       String ip=request.getRemoteAddr();
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isEmpty()) {
+            // X-Forwarded-For can be a comma-separated list — take the first one
+            ip = ip.split(",")[0].trim();
+        } else {
+            ip = request.getRemoteAddr();
+        }
 
 //        for testing
         // String ip="204.84.125.89";
